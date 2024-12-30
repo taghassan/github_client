@@ -1,7 +1,6 @@
 ## installastion
 
 ```
-dependencies:
 github_client:
     git: https://github.com/taghassan/github_client.git
 ```

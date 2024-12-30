@@ -10,10 +10,12 @@ import 'package:path_provider/path_provider.dart';
 export 'package:github/github.dart';
 export 'package:github/src/common/util/auth.dart';
 
+class GitHubAuthentication extends Authentication{}
+
 class GithubClient {
   final String owner;
   final String? token;
-  final Authentication? auth;
+  final GitHubAuthentication? auth;
   GitHub gitHubInstance=GitHub();
   GithubClient({required this.owner,this.token,this.auth}){
     if(token!=null){

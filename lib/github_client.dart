@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -22,6 +23,10 @@ class GithubClient {
   final String? token;
   final GitHubAuthentication? auth;
   GitHub gitHubInstance = GitHub();
+  Map<String, ProgressModel> syncProgressListMap = {};
+  StreamController<Map<String, ProgressModel>> syncProgressListStream =
+      StreamController<Map<String, ProgressModel>>();
+
   GithubClient({required this.owner, this.token, this.auth}) {
     if (token != null) {
       gitHubInstance = GitHub(auth: Authentication.withToken(token));
@@ -43,7 +48,7 @@ class GithubClient {
           pathInRepo: pathInRepo,
           folder: folder,
           token: token);
-
+      // AppLogger.it.logWarning("response $response");
       return response != null ? model.parser(response) : null;
     } catch (e) {
       rethrow;
@@ -69,13 +74,65 @@ class GithubClient {
 
     AppLogger.it.logInfo("githubCall repo $repo");
 
-    var file = repo.file;
-    await FileHandler.downloadFile(
-        url: file?.downloadUrl, fileName: file?.name, path: folder);
-    AppLogger.it.logInfo("repo ${file?.name}");
-    var response =
-        await FileHandler.readJsonFile(path: "$folder/${file?.name}");
-    return response;
+    if (repo.isFile) {
+      //***************** created by TajEldeen *****************//
+      // handle single file
+      //********************************************************//
+
+      var file = repo.file;
+      await FileHandler.downloadFile(
+          url: file?.downloadUrl, fileName: file?.name, path: folder);
+      AppLogger.it.logInfo("repo ${file?.name}");
+      var response =
+          await FileHandler.readJsonFile(path: "$folder/${file?.name}");
+      return response;
+    } else {
+      //***************** created by TajEldeen *****************//
+      // handle tree
+      //********************************************************//
+
+      Map<String, dynamic> repoFiles = {};
+      syncProgressListMap = {};
+      syncProgressListStream.add({});
+
+      for (var item in repo.toJson().entries) {
+        if (item.key == 'tree') {
+          syncProgressListMap[pathInRepo] = ProgressModel(
+              total: (item.value ?? []).length, synced: 0, path: pathInRepo);
+
+          for (var file in item.value ?? []) {
+            if (file is GitHubFile) {
+              AppLogger.it.logInfo("${file.name} ${file.type}");
+              if (file.downloadUrl != null) {
+                await FileHandler.downloadFile(
+                    url: file.downloadUrl, fileName: file.name, path: folder);
+                AppLogger.it.logInfo("repo ${file.name}");
+                var response = await FileHandler.readJsonFile(
+                    path: "$folder/${file.name}");
+                repoFiles[file.name.toString().replaceAll(".json", "")] =
+                    response;
+
+                try {
+                  syncProgressListMap[pathInRepo] = ProgressModel(
+                      total: (item.value ?? []).length,
+                      synced:
+                          (syncProgressListMap[pathInRepo]?.synced ?? 0) + 1,
+                      path: pathInRepo);
+                  syncProgressListStream.add(syncProgressListMap);
+                } catch (e) {
+                  AppLogger.it.logError("event message ${e}"); /**/
+                }
+              }
+            }
+            // AppLogger.it.logInfo("${item.value}");
+          }
+        }
+      }
+
+      return repoFiles;
+
+      throw "provided path is not valid file path";
+    }
   }
 }
 

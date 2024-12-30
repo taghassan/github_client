@@ -7,6 +7,8 @@ import 'package:github/github.dart';
 import 'package:github_client/base_data_model.dart';
 import 'package:path_provider/path_provider.dart';
 
+export 'package:github/github.dart';
+
 class GithubClient {
   final String owner;
   final String? token;

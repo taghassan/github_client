@@ -10,18 +10,24 @@ import 'package:path_provider/path_provider.dart';
 export 'package:github/github.dart';
 export 'package:github/src/common/util/auth.dart';
 
-class GitHubAuthentication extends Authentication{}
+class GitHubAuthentication extends Authentication {
+  GitHubAuthentication.withToken(super.token) : super.withToken();
+  GitHubAuthentication.bearerToken(super.bearerToken) : super.bearerToken();
+  GitHubAuthentication.anonymous() : super.anonymous();
+  GitHubAuthentication.basic(super.username, super.password) : super.basic();
+}
 
 class GithubClient {
   final String owner;
   final String? token;
   final GitHubAuthentication? auth;
-  GitHub gitHubInstance=GitHub();
-  GithubClient({required this.owner,this.token,this.auth}){
-    if(token!=null){
-      gitHubInstance=GitHub(auth: Authentication.withToken(token));
-    }else{
-       gitHubInstance=GitHub(auth: auth ??findAuthenticationFromEnvironment());
+  GitHub gitHubInstance = GitHub();
+  GithubClient({required this.owner, this.token, this.auth}) {
+    if (token != null) {
+      gitHubInstance = GitHub(auth: Authentication.withToken(token));
+    } else {
+      gitHubInstance =
+          GitHub(auth: auth ?? findAuthenticationFromEnvironment());
     }
   }
 
@@ -33,13 +39,12 @@ class GithubClient {
   }) async {
     try {
       var response = await githubCall(
-        repositoryName: repositoryName,
-        pathInRepo: pathInRepo,
-        folder: folder,
-          token:token
-      );
+          repositoryName: repositoryName,
+          pathInRepo: pathInRepo,
+          folder: folder,
+          token: token);
 
-      return response!=null?model.parser(response):null;
+      return response != null ? model.parser(response) : null;
     } catch (e) {
       rethrow;
     }
@@ -59,12 +64,10 @@ class GithubClient {
     AppLogger.it.logInfo("githubCall repositoryName $repositoryName");
     AppLogger.it.logInfo("githubCall token ${gitHubInstance.auth.token}");
 
-    var repo = (await
-    gitHubInstance.repositories
+    var repo = (await gitHubInstance.repositories
         .getContents(RepositorySlug(owner, repositoryName), pathInRepo));
 
     AppLogger.it.logInfo("githubCall repo $repo");
-
 
     var file = repo.file;
     await FileHandler.downloadFile(

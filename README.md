@@ -17,7 +17,9 @@ import 'package:github_client/github_client.dart';
 prepare mode
 ```
 class DataModel  extends BaseDataModel{
-
+ DataModel(){
+    /* ... */
+  }
   DataModel.fromJson(dynamic json) {/* ... */}
 
   @override
@@ -42,7 +44,7 @@ make api call
 ```
  
  try{
-late BaseDataModel? response = await client.fetchGithubData<DataModel>(
+ BaseDataModel? response = await client.fetchGithubData<DataModel>(
             model: DataModel(),
             pathInRepo: "file_path_inside_repo/folder_path_inside_repo",
             repositoryName: "repo_name",

@@ -10,10 +10,13 @@ import 'package:path_provider/path_provider.dart';
 class GithubClient {
   final String owner;
   final String? token;
+  final Authentication? auth;
   GitHub gitHubInstance=GitHub();
-  GithubClient({required this.owner,this.token}){
+  GithubClient({required this.owner,this.token,this.auth}){
     if(token!=null){
       gitHubInstance=GitHub(auth: Authentication.withToken(token));
+    }else{
+       gitHubInstance=GitHub(auth: auth ??findAuthenticationFromEnvironment());
     }
   }
 

@@ -1,3 +1,5 @@
+> important note file should contain valid json data
+
 ## installastion
 
 ```

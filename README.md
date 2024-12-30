@@ -12,13 +12,7 @@ import 'package:github_client/github_client.dart';
 ```
 
 ## usage
-
-```
- GithubClient client = GithubClient(
-          owner: "",
-          token: '');
-```
-
+prepare mode
 ```
 class DataModel  extends BaseDataModel{
 
@@ -36,7 +30,13 @@ class DataModel  extends BaseDataModel{
 
 } 
 ```
-
+create GithubClient instance 
+```
+ GithubClient client = GithubClient(
+          owner: "",
+          token: '');
+```
+make api call
 ```
  
  try{

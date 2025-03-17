@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   app_logger:
-    path: ../app_logger
-#    git: https://github.com/taghassan/app_logger
+#    path: ../app_logger
+    git: https://github.com/taghassan/app_logger
   path_provider:
   dio:
   github:
